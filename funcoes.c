@@ -31,3 +31,25 @@ void novo_cliente() {
         return;
     }
 
+    printf("Criar novo cliente:\n\n");
+
+    printf("CPF: ");
+    fgets(cliente.cpf, sizeof(cliente.cpf), stdin);
+    cliente.cpf[strcspn(cliente.cpf, "\n")] = '\0';
+
+    printf("Nome: ");
+    fgets(cliente.nome, sizeof(cliente.nome), stdin);
+    cliente.nome[strcspn(cliente.nome, "\n")] = '\0';
+
+    printf("Tipo de conta (1-Comum, 2-Plus): ");
+    fgets(cliente.tipo_de_conta, sizeof(cliente.tipo_de_conta), stdin);
+    cliente.tipo_de_conta[strcspn(cliente.tipo_de_conta, "\n")] = '\0';
+
+    printf("Valor inicial: ");
+    scanf("%f" , &cliente.saldo);
+    getchar();
+
+    printf("Digite a senha: ");
+    fgets(cliente.senha, sizeof(cliente.senha), stdin);
+    cliente.senha[strcspn(cliente.senha, "\n")] = '\0';
+
