@@ -11,3 +11,12 @@ struct Cliente {
     char senha[5];
 };
 
+struct Extrato {
+    char data[11];
+    char cpf[16];
+    char descricao[100];
+    float valor;
+    float tarifa;
+};
+
+
