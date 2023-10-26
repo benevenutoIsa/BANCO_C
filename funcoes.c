@@ -19,4 +19,15 @@ struct Extrato {
     float tarifa;
 };
 
+void novo_cliente() {
+    FILE *arquivo;
+    struct Cliente cliente;
+    int existe = 0;
+
+    // Abre o arquivo binário para leitura
+    arquivo = fopen("Clientes.bin", "rb");
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo.\n");
+        return;
+    }
 
