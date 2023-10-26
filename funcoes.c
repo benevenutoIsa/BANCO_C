@@ -36,6 +36,16 @@ void novo_cliente() {
     printf("CPF: ");
     fgets(cliente.cpf, sizeof(cliente.cpf), stdin);
     cliente.cpf[strcspn(cliente.cpf, "\n")] = '\0';
+    
+    // Verifica o tipo de conta
+    if (strcmp(cliente.tipo_de_conta, "1") == 0) {
+        strcpy(cliente.tipo_de_conta, "Comum");
+    } else if (strcmp(cliente.tipo_de_conta, "2") == 0) {
+        strcpy(cliente.tipo_de_conta, "Plus");
+    } else {
+        printf("\nTipo de conta inválido\n");
+        return;
+    }
 
     printf("Nome: ");
     fgets(cliente.nome, sizeof(cliente.nome), stdin);
