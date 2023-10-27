@@ -11,14 +11,6 @@ struct Cliente {
     char senha[5];
 };
 
-struct Extrato {
-    char data[11];
-    char cpf[16];
-    char descricao[100];
-    float valor;
-    float tarifa;
-};
-
 void novo_cliente() {
     FILE *arquivo;
     struct Cliente cliente;
@@ -106,7 +98,7 @@ void excluirCliente() {
         fwrite(&cliente, sizeof(cliente), 1, arquivo);
         printf("\nCliente removido!\n");
     } else {
-        printf("\nInexistente\n")
+        printf("\nInexistente\n");
     }
 
     fclose(arquivo);
