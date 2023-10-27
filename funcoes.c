@@ -106,7 +106,7 @@ void excluirCliente() {
         fwrite(&cliente, sizeof(cliente), 1, arquivo);
         printf("\nCliente removido!\n");
     } else {
-        printf("\nInexistente\n");
+        printf("\nInexistente\n")
     }
 
     fclose(arquivo);
