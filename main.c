@@ -2,7 +2,22 @@
 #include "funcoes.h"
 
 int main() {
+    FILE *arquivo_clientes, *arquivo_extrato;
 
+  arquivo_clientes = fopen("Clientes.bin", "ab");
+  if (arquivo_clientes == NULL) {
+      printf("Erro ao criar o arquivo de clientes.\n");
+      return 1; // Retorna um código de erro se a criação do arquivo falhar
+  }
+  fclose(arquivo_clientes);
+
+  arquivo_extrato = fopen("Extrato.bin", "ab");
+  if (arquivo_extrato == NULL) {
+      printf("Erro ao criar o arquivo de extrato.\n");
+      return 1; // Retorna um código de erro se a criação do arquivo falhar
+  }
+  fclose(arquivo_extrato);
+  
     int x;
     while (1){
         printf("\n1 - Novo Cliente\n");
