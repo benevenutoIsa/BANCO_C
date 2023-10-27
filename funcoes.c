@@ -97,3 +97,4 @@ void excluirCliente(char cpf[16]) {
 
     fclose(arquivo);
 }
+
