@@ -55,10 +55,9 @@ void novo_cliente() {
     fgets(cliente.senha, sizeof(cliente.senha), stdin);
     cliente.senha[strcspn(cliente.senha, "\n")] = '\0';
 
-void excluirCliente() {
+void excluirCliente(char cpf[16]) {
     FILE *arquivo;
     struct Cliente cliente;
-    char cpf[16];
     int encontrado = 0;
 
     // Abre o arquivo original para leitura e escrita em modo binário
@@ -68,11 +67,6 @@ void excluirCliente() {
         return;
     }
 
-    printf("Excluir Cliente!\n");
-
-    printf("Digite o CPF: ");
-    fgets(cpf, sizeof(cpf), stdin);
-    cpf[strcspn(cpf, "\n")] = '\0'; // Remove o caractere de nova linha
 
     // Verifica se o CPF está no formato correto
     if (strlen(cpf) != 14 || cpf[3] != '.' || cpf[7] != '.' || cpf[11] != '-') {
@@ -103,3 +97,37 @@ void excluirCliente() {
 
     fclose(arquivo);
 }
+
+void listar_clientes() {
+    FILE *arquivo;
+    struct Cliente cliente;
+
+    // Abre o arquivo binário para leitura
+    arquivo = fopen("Clientes.bin", "rb");
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo.\n");
+        return;
+    }
+
+    printf("Lista de Clientes:\n\n");
+
+    // Lê o primeiro cliente do arquivo
+    fread(&cliente, sizeof(struct Cliente), 1, arquivo);
+
+    // Lista todos os clientes existentes e todas as suas informações 
+    while (!feof(arquivo)) {
+        if (strcmp(cliente.cpf, "") != 0) {
+            printf("CPF: %s\n", cliente.cpf);
+            printf("Nome: %s\n", cliente.nome);
+            printf("Tipo: %s\n", cliente.tipo_de_conta);
+            printf("Saldo: %.2f\n", cliente.saldo);
+            printf("Senha: %s\n\n", cliente.senha);
+        }
+
+        // Lê o próximo cliente
+        fread(&cliente, sizeof(struct Cliente), 1, arquivo);
+    }
+
+    fclose(arquivo);
+}
+

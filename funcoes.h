@@ -4,3 +4,4 @@ void excluirCliente();
 void debito();
 void deposito();
 void extratos();
+void tranferencia();
