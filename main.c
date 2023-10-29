@@ -112,7 +112,7 @@ int main() {
 
                 printf("Transferencia!\n");
 
-                printf("Digite o CPF de origem: ");
+                printf("Digite o CPF de origem (Digite com ponto e barra: ***.***.***-**): ");
                 fgets(cpf_origem, sizeof(cpf_origem), stdin);
                 cpf_origem[strcspn(cpf_origem, "\n")] = '\0';
 
@@ -122,7 +122,7 @@ int main() {
                 senha_origem[strcspn(senha_origem, "\n")] = '\0';
                 getchar();
 
-                printf("Digite o CPF de destino: ");
+                printf("Digite o CPF de destino (Digite com ponto e barra: ***.***.***-**): ");
                 fgets(cpf_destino, sizeof(cpf_destino), stdin);
                 cpf_destino[strcspn(cpf_destino, "\n")] = '\0';
 
