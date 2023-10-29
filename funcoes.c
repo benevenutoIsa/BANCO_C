@@ -183,10 +183,10 @@ void listar_clientes() {
 }
 
 void deposito(char cpf[16]){
-
+    //abre os arquivos
     FILE *arquivo;
     FILE *extrato_arquivo;
-
+    
     struct Cliente cliente;
 
     // Variáveis de data e hora
@@ -206,26 +206,37 @@ void deposito(char cpf[16]){
     // Verifica se o cliente existe
     while (fread(&cliente, sizeof(struct Cliente), 1, arquivo)) {
         if (strcmp(cliente.cpf, cpf) == 0) {
+
+            //variavel do valor a ser depositado
             float valor;
 
             printf("Valor para Depósito: ");
             scanf("%f", &valor);
 
-            // Deposita na conta do cliente
+            //Altera o saldo do cliente fazendo o deposito
             cliente.saldo += valor;
-
-            // Faz alteração no arquivo
+        
+            // Faz as alterações do arquivo
             fseek(arquivo, -sizeof(struct Cliente), SEEK_CUR);
             fwrite(&cliente, sizeof(struct Cliente), 1, arquivo);
 
-            // Fecha o arquivo
+            // Fecha o arquivo de clientes
             fclose(arquivo);
+
+            //abre o arquivo de extrato
+            extrato_arquivo = fopen("Extrato.bin", "ab");
+            //Gera o extrato no arquivo de extrato
+            fprintf(extrato_arquivo, "Data: %s | Deposito: + %.2f | Saldo: %.2f _ %s\n", data_e_hora_em_texto, valor, cliente.saldo, cpf);
+            //fecha o arquivo de extrato
+            fclose(extrato_arquivo);
+
 
             printf("\nValor depositado!\n");
             return;
         }
     }
 
+    //Caso o cliente não exista , apresentará essa mensagem.
     printf("\nCPF inválido!\n");
 
     // Fecha o arquivo
