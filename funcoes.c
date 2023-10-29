@@ -182,3 +182,25 @@ void listar_clientes() {
     fclose(arquivo);
 }
 
+void deposito(char cpf[16]){
+
+    FILE *arquivo;
+    FILE *extrato_arquivo;
+
+    struct Cliente cliente;
+
+    // Variáveis de data e hora
+    time_t t = time(NULL);
+    struct tm *data_hora_atual = localtime(&t);
+    char data_e_hora_em_texto[20];
+    strftime(data_e_hora_em_texto, sizeof(data_e_hora_em_texto), "%d/%m/%Y %H:%M", data_hora_atual);
+
+    // Abre o arquivo para leitura e escrita
+    arquivo = fopen("Clientes.bin", "rb+");
+    //Verifica se o arquivo existe, caso nao exista exibe a mensagem de erro.
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo.\n");
+        return;
+    }
+
+}
