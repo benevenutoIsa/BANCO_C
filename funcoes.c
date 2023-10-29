@@ -334,5 +334,20 @@ void transferencia(char cpf_origem[16], char senha_origem[5], char cpf_destino[1
     // Renomeie o arquivo temporário para o nome do arquivo original
     remove("Clientes.bin");
     rename("Clientes_temp.bin", "Clientes.bin");
+
+    // Renomeie o arquivo temporário para o nome do arquivo original
+    remove("Clientes.bin");
+    rename("Clientes_temp.bin", "Clientes.bin");
+
+    // Gera o extrato no arquivo de extratos.
+    FILE *extrato_arquivo;
+    //abre o arquivo de extrato
+    extrato_arquivo = fopen("Extrato.bin", "ab");
+    //Cria os extratos no arquivo
+    fprintf(extrato_arquivo, "Data: %s | Tranferencia: - %.2f | Saldo:  %.2f _ %s\n", data_e_hora_em_texto, valor, cliente_origem.saldo, cpf_origem);
+    fprintf(extrato_arquivo, "Data: %s | Tranferencia: + %.2f | Saldo:  %.2f _ %s\n", data_e_hora_em_texto, valor, cliente_destino.saldo, cpf_destino);
+    fclose(extrato_arquivo);
+
+    printf("\nTransferência realizada com sucesso!\n");
 }
 
