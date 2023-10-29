@@ -182,6 +182,153 @@ void listar_clientes() {
     fclose(arquivo);
 }
 
+void debito(char cpf[16], char senha[5]) {
+    FILE *arquivo;
+    struct Cliente cliente;
+
+    // Variáveis de data e hora
+    time_t t = time(NULL);
+    struct tm *data_hora_atual = localtime(&t);
+    char data_e_hora_em_texto[20];
+    strftime(data_e_hora_em_texto, sizeof(data_e_hora_em_texto), "%d/%m/%Y %H:%M", data_hora_atual);
+
+    // Abre o arquivo para leitura e escrita binária
+    arquivo = fopen("Clientes.bin", "rb+");
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo.\n");
+        return;
+    }
+
+    while (fread(&cliente, sizeof(cliente), 1, arquivo)) {
+        if (strcmp(cliente.cpf, cpf) == 0 && strcmp(cliente.senha,senha) == 0) {
+
+            float valor;
+
+            printf("Valor para Debito: ");
+            scanf("%f", &valor);
+
+            // Verifica se a conta é Comum e tem saldo suficiente
+            if (strcmp(cliente.tipo_de_conta, "Comum") == 0 && cliente.saldo - valor < -1000) {
+                printf("\nSaldo insuficiente\n");
+                fclose(arquivo);
+                return;
+            }
+
+                // Verifica se a conta é Plus e tem saldo suficiente
+            else if (strcmp(cliente.tipo_de_conta, "Plus") == 0 && cliente.saldo - valor < -5000) {
+                printf("\nSaldo insuficiente\n");
+                fclose(arquivo);
+                return;
+            }
+
+            else {
+                // Débito para conta Comum
+                if (strcmp(cliente.tipo_de_conta, "Comum") == 0) {
+                    // Tarifa de 5%
+                    float tarifa = valor * 0.05;
+                    // Debita na conta do cliente
+                    cliente.saldo -= valor + tarifa;
+
+                    // Cria o extrato
+                    FILE *extrato_arquivo;
+                    extrato_arquivo = fopen("Extrato.bin", "ab");
+                    fprintf(extrato_arquivo, "Data: %s | Debito: - %.2f |Tarifa: %.2f | Saldo: %.2f _ %s\n", data_e_hora_em_texto, valor, tarifa, cliente.saldo, cpf);
+                    fclose(extrato_arquivo);
+
+                    // Faz alteração no arquivo
+                    fseek(arquivo, -sizeof(struct Cliente), SEEK_CUR);
+                    fwrite(&cliente, sizeof(struct Cliente), 1, arquivo);
+
+                    // Fecha o arquivo
+                    fclose(arquivo);
+
+                    printf("\nValor debitado!\n");
+                    return;
+                }
+
+                    // Débito para conta Plus
+                else if (strcmp(cliente.tipo_de_conta, "Plus") == 0) {
+                    // Tarifa de 3%
+                    float tarifa = valor * 0.03;
+                    // Debita na conta do cliente
+                    cliente.saldo -= valor + tarifa;
+
+                    // Cria o extrato
+                    FILE *extrato_arquivo;
+                    extrato_arquivo = fopen("Extrato.bin", "ab");
+                    fprintf(extrato_arquivo, "Data: %s | Debito: - %.2f |Tarifa: %.2f | Saldo: %.2f _ %s\n", data_e_hora_em_texto, valor, tarifa, cliente.saldo, cpf);
+                    fclose(extrato_arquivo);
+
+                    // Faz alteração no arquivo
+                    fseek(arquivo, -sizeof(struct Cliente), SEEK_CUR);
+                    fwrite(&cliente, sizeof(struct Cliente), 1, arquivo);
+
+                    // Fecha o arquivo
+                    fclose(arquivo);
+
+                    printf("\nValor debitado!\n");
+                    return;
+                }
+            }
+
+        }
+    }
+
+    printf("\nCPF ou senha inválida!\n");
+
+    // Fecha o arquivo
+    fclose(arquivo);
+}
+
+void extratos(char cpf[16], char senha[5]) {
+    FILE *arquivo_cliente;
+    FILE *arquivo_extrato;
+    struct Cliente cliente;
+
+    arquivo_cliente = fopen("Clientes.bin", "rb");
+    if (arquivo_cliente == NULL) {
+        printf("Erro ao abrir o arquivo de clientes.\n");
+        return;
+    }
+
+    arquivo_extrato = fopen("Extrato.bin", "rb");
+    if (arquivo_extrato == NULL) {
+        printf("Erro ao abrir o arquivo de extrato.\n");
+        fclose(arquivo_cliente);
+        return;
+    }
+
+    char linha[MAX_STRING];
+
+    printf("\nExtratos:\n\n");
+
+    while (fread(&cliente, sizeof(struct Cliente), 1, arquivo_cliente)) {
+        if (strcmp(cliente.cpf, cpf) == 0 && strcmp(cliente.senha, senha) == 0) {
+            while (fgets(linha, MAX_STRING, arquivo_extrato) != NULL) {
+                // Verifica se a linha contém o CPF
+                if (strstr(linha, cpf) != NULL) {
+                    // Encontra a posição do caractere '_' na linha
+                    char *underline_pos = strchr(linha, '_');
+                    if (underline_pos != NULL) {
+                        // Calcula o tamanho da substring a ser impressa
+                        size_t len_to_print = underline_pos - linha;
+                        // Imprime a parte relevante da linha
+                        printf("%.*s\n", (int)len_to_print, linha);
+                    }
+                }
+            }
+
+            fclose(arquivo_extrato);
+            fclose(arquivo_cliente);
+            return;
+        }
+    }
+
+    fclose(arquivo_cliente);
+    fclose(arquivo_extrato);
+    return;
+}
+
 void deposito(char cpf[16]){
     //abre os arquivos
     FILE *arquivo;
