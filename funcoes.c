@@ -1,5 +1,5 @@
 // Created by:
-// Isabela Benevenuto R.A.: 22.123
+// Isabela Benevenuto R.A.: 22.123.007-1
 // Kayky Pires R.A.: 22.222.040-2
 // Rafael Dias R.A.: 22.222.039-4
 
@@ -21,6 +21,26 @@ struct Cliente {
 
 #define MAX_STRING 100
 
+int contar_clientes() {
+    FILE *arquivo;
+    struct Cliente temp_cliente;
+    int contador = 0;
+
+    arquivo = fopen("Clientes.bin", "rb");
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo.\n");
+        return contador;
+    }
+
+    while (fread(&temp_cliente, sizeof(temp_cliente), 1, arquivo)) {
+        contador++;
+    }
+
+    fclose(arquivo);
+
+    return contador;
+}
+
 //Função de novo cliente
 void novo_cliente(char cpf[16]) {
     FILE *arquivo;
@@ -31,6 +51,13 @@ void novo_cliente(char cpf[16]) {
     //verifica se o arquivo existe, caso não exista aparecerá mensagem de erro
     if (arquivo == NULL) {
         printf("Erro ao abrir o arquivo.\n");
+        return;
+    }
+
+    // Verificar o número de clientes existentes
+    int numero_clientes = contar_clientes();
+    if (numero_clientes >= 1000) {
+        printf("\nLimite de clientes atingido (1000 clientes no máximo).\n");
         return;
     }
 
