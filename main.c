@@ -1,3 +1,8 @@
+// Created by:
+// Isabela Benevenuto R.A.: 22.123
+// Kayky Pires R.A.: 22.222.040-2
+// Rafael Dias R.A.: 22.222.039-4
+
 #include <stdio.h>
 #include "funcoes.h"
 #include <string.h>
@@ -13,14 +18,14 @@ struct Cliente {
 int main() {
 
     FILE *arquivo_clientes, *arquivo_extrato;
-  
+
     arquivo_clientes = fopen("Clientes.bin", "ab");
     if (arquivo_clientes == NULL) {
         printf("Erro ao criar o arquivo de clientes.\n");
         return 1; // Retorna um código de erro se a criação do arquivo falhar
     }
     fclose(arquivo_clientes);
-  
+
     arquivo_extrato = fopen("Extrato.bin", "ab");
     if (arquivo_extrato == NULL) {
         printf("Erro ao criar o arquivo de extrato.\n");
@@ -58,7 +63,7 @@ int main() {
 
                 printf("Criar novo cliente:\n\n");
 
-                printf("CPF: ");
+                printf("Digite o CPF (Digite com ponto e barra: ***.***.***-**): ");
                 fgets(cpf, sizeof(cpf), stdin);
                 cpf[strcspn(cpf, "\n")] = '\0';
 
@@ -83,7 +88,7 @@ int main() {
                 printf("Débitos!\n");
 
 
-                printf("Digite o CPF: ");
+                printf("Digite o CPF (Digite com ponto e barra: ***.***.***-**): ");
                 fgets(cpf, sizeof(cpf), stdin);
                 cpf[strcspn(cpf, "\n")] = '\0';
 
@@ -97,7 +102,7 @@ int main() {
 
                 printf("Deposito!\n");
 
-                printf("Digite o CPF: ");
+                printf("Digite o CPF (Digite com ponto e barra: ***.***.***-**): ");
                 fgets(cpf, sizeof(cpf), stdin);
                 cpf[strcspn(cpf, "\n")] = '\0';
 
@@ -110,25 +115,25 @@ int main() {
                 printf("Digite o CPF de origem: ");
                 fgets(cpf_origem, sizeof(cpf_origem), stdin);
                 cpf_origem[strcspn(cpf_origem, "\n")] = '\0';
-            
+
 
                 printf("Digite a senha da conta de origem: ");
                 fgets(senha_origem, sizeof(senha_origem), stdin);
                 senha_origem[strcspn(senha_origem, "\n")] = '\0';
                 getchar();
-                
+
                 printf("Digite o CPF de destino: ");
                 fgets(cpf_destino, sizeof(cpf_destino), stdin);
                 cpf_destino[strcspn(cpf_destino, "\n")] = '\0';
-                
-              
+
+
                 transferencia(cpf_origem,senha_origem,cpf_destino);
                 break;
             case 7:
 
                 printf("Extrato\n");
 
-                printf("Digite o CPF: ");
+                printf("Digite o CPF (Digite com ponto e barra: ***.***.***-**): ");
                 fgets(cpf, sizeof(cpf), stdin);
                 cpf[strcspn(cpf, "\n")] = '\0';
 
