@@ -203,4 +203,32 @@ void deposito(char cpf[16]){
         return;
     }
 
+    // Verifica se o cliente existe
+    while (fread(&cliente, sizeof(struct Cliente), 1, arquivo)) {
+        if (strcmp(cliente.cpf, cpf) == 0) {
+            float valor;
+
+            printf("Valor para Depósito: ");
+            scanf("%f", &valor);
+
+            // Deposita na conta do cliente
+            cliente.saldo += valor;
+
+            // Faz alteração no arquivo
+            fseek(arquivo, -sizeof(struct Cliente), SEEK_CUR);
+            fwrite(&cliente, sizeof(struct Cliente), 1, arquivo);
+
+            // Fecha o arquivo
+            fclose(arquivo);
+
+            printf("\nValor depositado!\n");
+            return;
+        }
+    }
+
+    printf("\nCPF inválido!\n");
+
+    // Fecha o arquivo
+    fclose(arquivo);
 }
+
