@@ -1,7 +1,7 @@
 // Created by:
 // Isabela Benevenuto R.A.: 22.123
-// Kayky Pires R.A.: 22.222.040/2
-// Rafael Dias R.A.: 22.222
+// Kayky Pires R.A.: 22.222.040-2
+// Rafael Dias R.A.: 22.222.039-4
 
 #include "funcoes.h"
 #include <stdio.h>
@@ -180,5 +180,174 @@ void listar_clientes() {
     }
 
     fclose(arquivo);
+}
+
+void deposito(char cpf[16]){
+    //abre os arquivos
+    FILE *arquivo;
+    FILE *extrato_arquivo;
+    
+    struct Cliente cliente;
+
+    // Variáveis de data e hora
+    time_t t = time(NULL);
+    struct tm *data_hora_atual = localtime(&t);
+    char data_e_hora_em_texto[20];
+    strftime(data_e_hora_em_texto, sizeof(data_e_hora_em_texto), "%d/%m/%Y %H:%M", data_hora_atual);
+
+    // Abre o arquivo para leitura e escrita
+    arquivo = fopen("Clientes.bin", "rb+");
+    //Verifica se o arquivo existe, caso nao exista exibe a mensagem de erro.
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo.\n");
+        return;
+    }
+
+    // Verifica se o cliente existe
+    while (fread(&cliente, sizeof(struct Cliente), 1, arquivo)) {
+        if (strcmp(cliente.cpf, cpf) == 0) {
+
+            //variavel do valor a ser depositado
+            float valor;
+
+            printf("Valor para Depósito: ");
+            scanf("%f", &valor);
+
+            //Altera o saldo do cliente fazendo o deposito
+            cliente.saldo += valor;
+        
+            // Faz as alterações do arquivo
+            fseek(arquivo, -sizeof(struct Cliente), SEEK_CUR);
+            fwrite(&cliente, sizeof(struct Cliente), 1, arquivo);
+
+            // Fecha o arquivo de clientes
+            fclose(arquivo);
+
+            //abre o arquivo de extrato
+            extrato_arquivo = fopen("Extrato.bin", "ab");
+            //Gera o extrato no arquivo de extrato
+            fprintf(extrato_arquivo, "Data: %s | Deposito: + %.2f | Saldo: %.2f _ %s\n", data_e_hora_em_texto, valor, cliente.saldo, cpf);
+            //fecha o arquivo de extrato
+            fclose(extrato_arquivo);
+
+
+            printf("\nValor depositado!\n");
+            return;
+        }
+    }
+
+    //Caso o cliente não exista , apresentará essa mensagem.
+    printf("\nCPF inválido!\n");
+
+    // Fecha o arquivo
+    fclose(arquivo);
+}
+
+void transferencia(char cpf_origem[16], char senha_origem[5], char cpf_destino[16]){
+    FILE *arquivo;
+    struct Cliente cliente;
+    struct Cliente cliente_origem, cliente_destino;
+
+
+    // Variáveis de data e hora
+    time_t t = time(NULL);
+    struct tm *data_hora_atual = localtime(&t);
+    char data_e_hora_em_texto[20];
+    strftime(data_e_hora_em_texto, sizeof(data_e_hora_em_texto), "%d/%m/%Y %H:%M", data_hora_atual);
+
+    float valor;
+
+    printf("Digite o valor da transferencia: ");
+    scanf("%f", &valor);
+
+
+    // Abre o arquivo para leitura e escrita
+    arquivo = fopen("Clientes.bin", "r+");
+    //verifica se o arquivo existe, caso não exista, aparecerá uma mensagem de erro
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo.\n");
+        return;
+    }
+
+    //variaveis para Verificar se os CPFs de origem e destino existem
+    int origem_encontrado = 0;
+    int destino_encontrado = 0;
+  
+    // Encontre o cliente de origem e destino
+    while (fread(&cliente, sizeof(struct Cliente), 1, arquivo)) {
+        if (strcmp(cliente.cpf, cpf_origem) == 0 && strcmp(cliente.senha, senha_origem) == 0) {
+            cliente_origem = cliente;
+            origem_encontrado = 1;
+        } else if (strcmp(cliente.cpf, cpf_destino) == 0) {
+            cliente_destino = cliente;
+            destino_encontrado = 1;
+        }
+    }
+    //Caso não exista cliente de origem ou senha estejaminvalida , aparecerá erro
+    if (!origem_encontrado) {
+        printf("\nCPF de origem ou senha inválida!\n");
+        fclose(arquivo);
+        return;
+    }
+    //Caso cliente de destino não exista , aparecerá erro
+    if (!destino_encontrado) {
+        printf("\nCPF de destino inválido!\n");
+        fclose(arquivo);
+        return;
+    }
+  
+    // Verifica se a conta de origem tem saldo suficiente
+    if (cliente_origem.saldo < valor) {
+        printf("\nSaldo insuficiente!\n");
+        fclose(arquivo);
+        return;
+    }
+  
+    // Atualiza os saldos das contas de origem e destino
+    cliente_origem.saldo -= valor;
+    cliente_destino.saldo += valor;
+  
+    // Fecha o arquivo
+    fclose(arquivo);
+  
+    // Abre um arquivo temporário para gravar os dados atualizados
+    FILE *temp_arquivo = fopen("Clientes_temp.bin", "w");
+  
+    // Volte ao início do arquivo original
+    arquivo = fopen("Clientes.bin", "r");
+  
+    // Copie os registros para o arquivo temporário com as atualizações
+    while (fread(&cliente, sizeof(struct Cliente), 1, arquivo)) {
+        if (strcmp(cliente.cpf, cpf_origem) == 0) {
+            fwrite(&cliente_origem, sizeof(struct Cliente), 1, temp_arquivo);
+        } else if (strcmp(cliente.cpf, cpf_destino) == 0) {
+            fwrite(&cliente_destino, sizeof(struct Cliente), 1, temp_arquivo);
+        } else {
+            fwrite(&cliente, sizeof(struct Cliente), 1, temp_arquivo);
+        }
+    }
+  
+    // Fecha ambos os arquivos
+    fclose(arquivo);
+    fclose(temp_arquivo);
+  
+    // Renomeie o arquivo temporário para o nome do arquivo original
+    remove("Clientes.bin");
+    rename("Clientes_temp.bin", "Clientes.bin");
+
+    // Renomeie o arquivo temporário para o nome do arquivo original
+    remove("Clientes.bin");
+    rename("Clientes_temp.bin", "Clientes.bin");
+
+    // Gera o extrato no arquivo de extratos.
+    FILE *extrato_arquivo;
+    //abre o arquivo de extrato
+    extrato_arquivo = fopen("Extrato.bin", "ab");
+    //Cria os extratos no arquivo
+    fprintf(extrato_arquivo, "Data: %s | Tranferencia: - %.2f | Saldo:  %.2f _ %s\n", data_e_hora_em_texto, valor, cliente_origem.saldo, cpf_origem);
+    fprintf(extrato_arquivo, "Data: %s | Tranferencia: + %.2f | Saldo:  %.2f _ %s\n", data_e_hora_em_texto, valor, cliente_destino.saldo, cpf_destino);
+    fclose(extrato_arquivo);
+
+    printf("\nTransferência realizada com sucesso!\n");
 }
 
