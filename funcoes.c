@@ -1,6 +1,7 @@
-//
-// Created by unifrcosta on 20/10/2023.
-//
+// Created by:
+// Isabela Benevenuto R.A.: 22.123
+// Kayky Pires R.A.: 22.222.040-2
+// Rafael Dias R.A.: 22.222.039-4
 
 #include "funcoes.h"
 #include <stdio.h>
