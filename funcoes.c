@@ -243,3 +243,18 @@ void deposito(char cpf[16]){
     fclose(arquivo);
 }
 
+void transferencia(char cpf_origem[16], char senha[5], char cpf_destino[16]){
+    FILE *arquivo;
+    struct Cliente cliente;
+    struct Cliente cliente_origem, cliente_destino;
+
+
+    // Variáveis de data e hora
+    time_t t = time(NULL);
+    struct tm *data_hora_atual = localtime(&t);
+    char data_e_hora_em_texto[20];
+    strftime(data_e_hora_em_texto, sizeof(data_e_hora_em_texto), "%d/%m/%Y %H:%M", data_hora_atual);
+
+    
+}
+
