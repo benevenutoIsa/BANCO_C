@@ -354,12 +354,12 @@ void transferencia(char cpf_origem[16], char senha_origem[5], char cpf_destino[1
 
     // Abre o arquivo para leitura e escrita
     arquivo = fopen("Clientes.bin", "r+");
+    //Verifica se o arquivo existe, caso não exista aparecerá uma mensagem de erro
     if (arquivo == NULL) {
         printf("Erro ao abrir o arquivo.\n");
         return;
     }
 
-      // Verifica se os CPFs de origem e destino existem
     // Verifica se os CPFs de origem e destino existem
     int origem_encontrado = 0;
     int destino_encontrado = 0;
@@ -374,24 +374,37 @@ void transferencia(char cpf_origem[16], char senha_origem[5], char cpf_destino[1
             destino_encontrado = 1;
         }
     }
-  
+    
+    //verifica se o cliente de origem existe
     if (!origem_encontrado) {
         printf("\nCPF de origem ou senha inválida!\n");
         fclose(arquivo);
         return;
     }
-  
+    
+    //verifica se o cliente de destino existe
     if (!destino_encontrado) {
         printf("\nCPF de destino inválido!\n");
         fclose(arquivo);
         return;
     }
   
-    // Verifica se a conta de origem tem saldo suficiente
-    if (cliente_origem.saldo < valor) {
+    // Verifica se a conta de origem é Comum e tem saldo suficiente
+    if (strcmp(cliente_origem.tipo_de_conta ,"Comum") == 0) {
+      if (cliente_origem.saldo - valor < -1000){
         printf("\nSaldo insuficiente!\n");
         fclose(arquivo);
         return;
+      }
+    }
+
+    // Verifica se a conta de origem é Plus e tem saldo suficiente
+    if (strcmp(cliente_origem.tipo_de_conta, "Plus") == 0) {
+      if (cliente_origem.saldo - valor < -5000){
+        printf("\nSaldo insuficiente!\n");
+        fclose(arquivo);
+        return;
+      }
     }
   
     // Atualiza os saldos das contas de origem e destino
@@ -426,11 +439,17 @@ void transferencia(char cpf_origem[16], char senha_origem[5], char cpf_destino[1
     remove("Clientes.bin");
     rename("Clientes_temp.bin", "Clientes.bin");
 
-    // Atualiza o extrato da conta de origem
+    // Cria o extrato da operação od cliente de origem e destino
     FILE *extrato_arquivo;
+    //Abre o arquivo para adicionar os extratos
     extrato_arquivo = fopen("Extrato.bin", "ab");
+    //Extrato do cliente de origem
     fprintf(extrato_arquivo, "Data: %s | Tranferencia: - %.2f | Saldo:  %.2f _ %s\n", data_e_hora_em_texto, valor, cliente_origem.saldo, cpf_origem);
+
+    //Extrato do cliente de destino
     fprintf(extrato_arquivo, "Data: %s | Tranferencia: + %.2f | Saldo:  %.2f _ %s\n", data_e_hora_em_texto, valor, cliente_destino.saldo, cpf_destino);
+
+    //fecha o arquivo
     fclose(extrato_arquivo);
 
     printf("\nTransferência realizada com sucesso!\n");
@@ -441,13 +460,17 @@ void extratos(char cpf[16], char senha[5]) {
     FILE *arquivo_extrato;
     struct Cliente cliente;
 
+    //Abre o arquivo para leitura
     arquivo_cliente = fopen("Clientes.bin", "rb");
+    //verifica se o arquivo existe, caso não exista aparecerá mensagem de erro
     if (arquivo_cliente == NULL) {
         printf("Erro ao abrir o arquivo de clientes.\n");
         return;
     }
 
+    //abre o arquivo para leitura
     arquivo_extrato = fopen("Extrato.bin", "rb");
+    //verifica se o arquivo existe, caso não exista aparecerá mensagem de erro
     if (arquivo_extrato == NULL) {
         printf("Erro ao abrir o arquivo de extrato.\n");
         fclose(arquivo_cliente);
