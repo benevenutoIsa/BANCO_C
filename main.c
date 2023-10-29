@@ -1,3 +1,8 @@
+// Created by:
+// Isabela Benevenuto R.A.: 22.123
+// Kayky Pires R.A.: 22.222.040-2
+// Rafael Dias R.A.: 22.222.039-4
+
 #include <stdio.h>
 #include "funcoes.h"
 #include <string.h>
