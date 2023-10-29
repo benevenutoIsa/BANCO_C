@@ -8,6 +8,8 @@
 #include <string.h>
 #include <time.h>
 
+
+
 struct Cliente {
     char cpf[16];
     char nome[100];
@@ -105,6 +107,7 @@ void novo_cliente(char cpf[16]) {
         printf("\nNovo cliente criado com sucesso!\n");
     }
     }
+
 
 
 void excluirCliente(char cpf[16]) {
