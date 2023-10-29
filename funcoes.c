@@ -182,3 +182,64 @@ void listar_clientes() {
     fclose(arquivo);
 }
 
+void deposito(char cpf[16]){
+    //abre os arquivos
+    FILE *arquivo;
+    FILE *extrato_arquivo;
+    
+    struct Cliente cliente;
+
+    // Variáveis de data e hora
+    time_t t = time(NULL);
+    struct tm *data_hora_atual = localtime(&t);
+    char data_e_hora_em_texto[20];
+    strftime(data_e_hora_em_texto, sizeof(data_e_hora_em_texto), "%d/%m/%Y %H:%M", data_hora_atual);
+
+    // Abre o arquivo para leitura e escrita
+    arquivo = fopen("Clientes.bin", "rb+");
+    //Verifica se o arquivo existe, caso nao exista exibe a mensagem de erro.
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo.\n");
+        return;
+    }
+
+    // Verifica se o cliente existe
+    while (fread(&cliente, sizeof(struct Cliente), 1, arquivo)) {
+        if (strcmp(cliente.cpf, cpf) == 0) {
+
+            //variavel do valor a ser depositado
+            float valor;
+
+            printf("Valor para Depósito: ");
+            scanf("%f", &valor);
+
+            //Altera o saldo do cliente fazendo o deposito
+            cliente.saldo += valor;
+        
+            // Faz as alterações do arquivo
+            fseek(arquivo, -sizeof(struct Cliente), SEEK_CUR);
+            fwrite(&cliente, sizeof(struct Cliente), 1, arquivo);
+
+            // Fecha o arquivo de clientes
+            fclose(arquivo);
+
+            //abre o arquivo de extrato
+            extrato_arquivo = fopen("Extrato.bin", "ab");
+            //Gera o extrato no arquivo de extrato
+            fprintf(extrato_arquivo, "Data: %s | Deposito: + %.2f | Saldo: %.2f _ %s\n", data_e_hora_em_texto, valor, cliente.saldo, cpf);
+            //fecha o arquivo de extrato
+            fclose(extrato_arquivo);
+
+
+            printf("\nValor depositado!\n");
+            return;
+        }
+    }
+
+    //Caso o cliente não exista , apresentará essa mensagem.
+    printf("\nCPF inválido!\n");
+
+    // Fecha o arquivo
+    fclose(arquivo);
+}
+
