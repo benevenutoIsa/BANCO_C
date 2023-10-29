@@ -3,13 +3,14 @@
 // Kayky Pires R.A.: 22.222.040-2
 // Rafael Dias R.A.: 22.222.039-4
 
+//Bibliotecas usadas
 #include "funcoes.h"
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
 
 
-
+//Struct de clientes
 struct Cliente {
     char cpf[16];
     char nome[100];
@@ -20,12 +21,14 @@ struct Cliente {
 
 #define MAX_STRING 100
 
+//Função de novo cliente
 void novo_cliente(char cpf[16]) {
     FILE *arquivo;
     struct Cliente cliente;
     int encontrado = 0;
-    // Abre o arquivo binário para leitura
+    // Abre o arquivo para leitura
     arquivo = fopen("Clientes.bin", "rb");
+    //verifica se o arquivo existe, caso não exista aparecerá mensagem de erro
     if (arquivo == NULL) {
         printf("Erro ao abrir o arquivo.\n");
         return;
@@ -61,6 +64,7 @@ void novo_cliente(char cpf[16]) {
     }
 
     fclose(arquivo);
+    //informa se o cliente existe
     if(encontrado == 1){
         printf("Cliente existente");
         return;
@@ -94,6 +98,7 @@ void novo_cliente(char cpf[16]) {
 
         // Abre o arquivo binário para escrita em modo de adição
         arquivo = fopen("Clientes.bin", "ab");
+        //verifica se o arquivo existe, caso não exista aparecerá mensagem de erro
         if (arquivo == NULL) {
             printf("Erro ao abrir o arquivo.\n");
             return;
@@ -109,7 +114,7 @@ void novo_cliente(char cpf[16]) {
     }
 
 
-
+//Função para excluir o cliente
 void excluirCliente(char cpf[16]) {
     FILE *arquivo;
     struct Cliente cliente;
@@ -117,6 +122,7 @@ void excluirCliente(char cpf[16]) {
 
     // Abre o arquivo original para leitura e escrita em modo binário
     arquivo = fopen("Clientes.bin", "rb+");
+    //verifica se o arquivo existe, caso não exista aparecerá mensagem de erro
     if (arquivo == NULL) {
         printf("Erro ao abrir o arquivo.\n");
         return;
@@ -153,12 +159,14 @@ void excluirCliente(char cpf[16]) {
     fclose(arquivo);
 }
 
+//função para listar os clientes
 void listar_clientes() {
     FILE *arquivo;
     struct Cliente cliente;
 
     // Abre o arquivo binário para leitura
     arquivo = fopen("Clientes.bin", "rb");
+    //verifica se o arquivo existe, caso não exista aparecerá mensagem de erro
     if (arquivo == NULL) {
         printf("Erro ao abrir o arquivo.\n");
         return;
@@ -186,6 +194,8 @@ void listar_clientes() {
     fclose(arquivo);
 }
 
+
+//função para debito
 void debito(char cpf[16], char senha[5]) {
     FILE *arquivo;
     struct Cliente cliente;
@@ -198,12 +208,14 @@ void debito(char cpf[16], char senha[5]) {
 
     // Abre o arquivo para leitura e escrita binária
     arquivo = fopen("Clientes.bin", "rb+");
+    //verifica se o arquivo existe, caso não exista aparecerá mensagem de erro
     if (arquivo == NULL) {
         printf("Erro ao abrir o arquivo.\n");
         return;
     }
 
     while (fread(&cliente, sizeof(cliente), 1, arquivo)) {
+        //verifica se o cliente e a senha estão corretos
         if (strcmp(cliente.cpf, cpf) == 0 && strcmp(cliente.senha,senha) == 0) {
 
             float valor;
@@ -235,7 +247,10 @@ void debito(char cpf[16], char senha[5]) {
 
                     // Cria o extrato
                     FILE *extrato_arquivo;
+
+                    //abre arquivo para adiconar o extrato
                     extrato_arquivo = fopen("Extrato.bin", "ab");
+                    //adiciona o extrato no arquivo
                     fprintf(extrato_arquivo, "Data: %s | Debito: - %.2f |Tarifa: %.2f | Saldo: %.2f _ %s\n", data_e_hora_em_texto, valor, tarifa, cliente.saldo, cpf);
                     fclose(extrato_arquivo);
 
@@ -259,7 +274,10 @@ void debito(char cpf[16], char senha[5]) {
 
                     // Cria o extrato
                     FILE *extrato_arquivo;
+
+                    //abre o arquivo para adicionar o extrato
                     extrato_arquivo = fopen("Extrato.bin", "ab");
+                    //adiciona o extrato no arquivo
                     fprintf(extrato_arquivo, "Data: %s | Debito: - %.2f |Tarifa: %.2f | Saldo: %.2f _ %s\n", data_e_hora_em_texto, valor, tarifa, cliente.saldo, cpf);
                     fclose(extrato_arquivo);
 
@@ -284,6 +302,8 @@ void debito(char cpf[16], char senha[5]) {
     fclose(arquivo);
 }
 
+
+//função para deposito
 void deposito(char cpf[16]) {
     FILE *arquivo, *extrato_arquivo;
     struct Cliente cliente;
@@ -297,6 +317,7 @@ void deposito(char cpf[16]) {
 
     // Abre o arquivo para leitura e escrita
     arquivo = fopen("Clientes.bin", "rb+");
+    //verifica se o arquivo existe, caso não exista aparecerá mensagem de erro
     if (arquivo == NULL) {
         printf("Erro ao abrir o arquivo.\n");
         return;
@@ -320,8 +341,9 @@ void deposito(char cpf[16]) {
             // Fecha o arquivo
             fclose(arquivo);
 
-            // Atualiza o extrato
+            // abre o arquivo para adicionar o extrato
             extrato_arquivo = fopen("Extrato.bin", "ab");
+            //adiciona o extrato no arquivo
             fprintf(extrato_arquivo, "Data: %s | Deposito: + %.2f | Saldo: %.2f _ %s\n", data_e_hora_em_texto, valor, cliente.saldo, cpf);
             fclose(extrato_arquivo);
 
@@ -336,10 +358,13 @@ void deposito(char cpf[16]) {
     fclose(arquivo);
 }
 
+
+//função para transferencia
 void transferencia(char cpf_origem[16], char senha_origem[5], char cpf_destino[16]) {
     FILE *arquivo;
     struct Cliente cliente;
     struct Cliente cliente_origem, cliente_destino;
+    
     // Variáveis de data e hora
     time_t t = time(NULL);
     struct tm *data_hora_atual = localtime(&t);
