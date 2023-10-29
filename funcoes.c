@@ -8,8 +8,6 @@
 #include <string.h>
 #include <time.h>
 
-
-
 struct Cliente {
     char cpf[16];
     char nome[100];
@@ -88,7 +86,7 @@ void novo_cliente(char cpf[16]) {
         scanf("%f" , &cliente.saldo);
         getchar();
 
-        printf("Digite a senha: ");
+        printf("Digite a senha (APENAS 4 NUMEROS): ");
         fgets(cliente.senha, sizeof(cliente.senha), stdin);
         cliente.senha[strcspn(cliente.senha, "\n")] = '\0';
 
@@ -107,8 +105,6 @@ void novo_cliente(char cpf[16]) {
         printf("\nNovo cliente criado com sucesso!\n");
     }
     }
-
-
 
 void excluirCliente(char cpf[16]) {
     FILE *arquivo;
@@ -169,7 +165,7 @@ void listar_clientes() {
     // Lê o primeiro cliente do arquivo
     fread(&cliente, sizeof(struct Cliente), 1, arquivo);
 
-    // Lista todos os clientes existentes e todas as suas informações 
+    // Lista todos os clientes existentes
     while (!feof(arquivo)) {
         if (strcmp(cliente.cpf, "") != 0) {
             printf("CPF: %s\n", cliente.cpf);
