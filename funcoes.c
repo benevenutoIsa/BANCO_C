@@ -1,7 +1,12 @@
+// Created by:
+// Isabela Benevenuto R.A.: 22.123
+// Kayky Pires R.A.: 22.222.040/2
+// Rafael Dias R.A.: 22.222
+
 #include "funcoes.h"
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
+#include <time.h>
 
 struct Cliente {
     char cpf[16];
@@ -11,11 +16,12 @@ struct Cliente {
     char senha[5];
 };
 
-void novo_cliente() {
+#define MAX_STRING 100
+
+void novo_cliente(char cpf[16]) {
     FILE *arquivo;
     struct Cliente cliente;
-    int existe = 0;
-
+    int encontrado = 0;
     // Abre o arquivo binário para leitura
     arquivo = fopen("Clientes.bin", "rb");
     if (arquivo == NULL) {
@@ -23,37 +29,82 @@ void novo_cliente() {
         return;
     }
 
-    printf("Criar novo cliente:\n\n");
+    // Copia o CPF informado para a struct cliente
+    strcpy(cliente.cpf, cpf);
 
-    printf("CPF: ");
-    fgets(cliente.cpf, sizeof(cliente.cpf), stdin);
-    cliente.cpf[strcspn(cliente.cpf, "\n")] = '\0';
-    
-    // Verifica o tipo de conta
-    if (strcmp(cliente.tipo_de_conta, "1") == 0) {
-        strcpy(cliente.tipo_de_conta, "Comum");
-    } else if (strcmp(cliente.tipo_de_conta, "2") == 0) {
-        strcpy(cliente.tipo_de_conta, "Plus");
-    } else {
-        printf("\nTipo de conta inválido\n");
+    // Valida o CPF
+    if (strlen(cliente.cpf) != 14 || cliente.cpf[3] != '.' || cliente.cpf[7] != '.' || cliente.cpf[11] != '-') {
+        printf("\nCPF invalido!\n");
         return;
     }
 
-    printf("Nome: ");
-    fgets(cliente.nome, sizeof(cliente.nome), stdin);
-    cliente.nome[strcspn(cliente.nome, "\n")] = '\0';
+    // Verifica se o arquivo está vazio
+    fseek(arquivo, 0, SEEK_END);
+    if (ftell(arquivo) == 0) {
+        encontrado = 0;
+    } else {
+        // Volta para o início do arquivo
+        rewind(arquivo);
 
-    printf("Tipo de conta (1-Comum, 2-Plus): ");
-    fgets(cliente.tipo_de_conta, sizeof(cliente.tipo_de_conta), stdin);
-    cliente.tipo_de_conta[strcspn(cliente.tipo_de_conta, "\n")] = '\0';
+        // Procura pelo CPF no arquivo original
+        char cpf_arquivo[16];
+        struct Cliente temp_cliente;
+        while (fread(&temp_cliente, sizeof(temp_cliente), 1, arquivo)) {
+            strcpy(cpf_arquivo, temp_cliente.cpf);
+            if (strcmp(cpf_arquivo, cpf) == 0) {
+                encontrado = 1;
+                break;
+            }
+        }
+    }
 
-    printf("Valor inicial: ");
-    scanf("%f" , &cliente.saldo);
-    getchar();
+    fclose(arquivo);
+    if(encontrado == 1){
+        printf("Cliente existente");
+        return;
+    } else {
 
-    printf("Digite a senha: ");
-    fgets(cliente.senha, sizeof(cliente.senha), stdin);
-    cliente.senha[strcspn(cliente.senha, "\n")] = '\0';
+        printf("Nome: ");
+        fgets(cliente.nome, sizeof(cliente.nome), stdin);
+        cliente.nome[strcspn(cliente.nome, "\n")] = '\0';
+
+        printf("Tipo de conta (1-Comum, 2-Plus): ");
+        fgets(cliente.tipo_de_conta, sizeof(cliente.tipo_de_conta), stdin);
+        cliente.tipo_de_conta[strcspn(cliente.tipo_de_conta, "\n")] = '\0';
+
+        // Verifica o tipo de conta
+        if (strcmp(cliente.tipo_de_conta, "1") == 0) {
+            strcpy(cliente.tipo_de_conta, "Comum");
+        } else if (strcmp(cliente.tipo_de_conta, "2") == 0) {
+            strcpy(cliente.tipo_de_conta, "Plus");
+        } else {
+            printf("\nTipo de conta invalido\n");
+            return;
+        }
+
+        printf("Valor inicial: ");
+        scanf("%f" , &cliente.saldo);
+        getchar();
+
+        printf("Digite a senha (APENAS 4 NUMEROS): ");
+        fgets(cliente.senha, sizeof(cliente.senha), stdin);
+        cliente.senha[strcspn(cliente.senha, "\n")] = '\0';
+
+        // Abre o arquivo binário para escrita em modo de adição
+        arquivo = fopen("Clientes.bin", "ab");
+        if (arquivo == NULL) {
+            printf("Erro ao abrir o arquivo.\n");
+            return;
+        }
+
+        // Escreve o cliente no arquivo
+        fwrite(&cliente, sizeof(struct Cliente), 1, arquivo);
+
+        fclose(arquivo);
+
+        printf("\nNovo cliente criado com sucesso!\n");
+    }
+    }
 
 void excluirCliente(char cpf[16]) {
     FILE *arquivo;
@@ -114,7 +165,7 @@ void listar_clientes() {
     // Lê o primeiro cliente do arquivo
     fread(&cliente, sizeof(struct Cliente), 1, arquivo);
 
-    // Lista todos os clientes existentes e todas as suas informações 
+    // Lista todos os clientes existentes
     while (!feof(arquivo)) {
         if (strcmp(cliente.cpf, "") != 0) {
             printf("CPF: %s\n", cliente.cpf);

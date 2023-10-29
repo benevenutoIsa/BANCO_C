@@ -69,7 +69,7 @@ int main() {
 
                 printf("Excluir Cliente!\n");
 
-                printf("Digite o CPF: ");
+                printf("Digite o CPF (Digite com ponto e barra: ***.***.***-**): ");
                 fgets(cpf, sizeof(cpf), stdin);
                 cpf[strcspn(cpf, "\n")] = '\0';
 
