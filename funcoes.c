@@ -119,7 +119,7 @@ void novo_cliente(char cpf[16]) {
         scanf("%f" , &cliente.saldo);
         getchar();
 
-        printf("Digite a senha: ");
+        printf("Digite a senha (APENAS 4 NÚMEROS): ");
         fgets(cliente.senha, sizeof(cliente.senha), stdin);
         cliente.senha[strcspn(cliente.senha, "\n")] = '\0';
 
